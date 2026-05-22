@@ -35,21 +35,20 @@ const position = pageGeometry.attributes.position;
 
 const vertex = new Vector3();
 const skinIndex = []; // bones
-const skinWeights = []; // renamed: avoids shadowing by the loop variable
-
+const skinWeights = [];
 for (let i = 0; i < position.count; i++) {
     vertex.fromBufferAttribute(position, i);
     const x = vertex.x;
 
     const boneIndex = Math.max(0, Math.floor(x / segmentWidth));
-    const weight = (x % segmentWidth) / segmentWidth; // renamed: was 'skinWeight', shadowed the array
+    const weight = (x % segmentWidth) / segmentWidth;
 
-    skinIndex.push(boneIndex, boneIndex + 1, 0, 0); // fixed: was skinIndex + 1 (array ref, not a number)
-    skinWeights.push(1 - weight, weight, 0, 0);     // fixed: shadowed var + was missing 4th value
+    skinIndex.push(boneIndex, boneIndex + 1, 0, 0);
+    skinWeights.push(1 - weight, weight, 0, 0);
 }
 
 pageGeometry.setAttribute(
-    "skinIndex",  // Three.js requires this exact name for skeleton binding
+    "skinIndex",
     new Uint16BufferAttribute(skinIndex, 4)
 );
 pageGeometry.setAttribute(
@@ -58,11 +57,10 @@ pageGeometry.setAttribute(
 );
 
 const pageMats = [
-    new MeshStandardMaterial({ color: whiteColor }),  // 0: right edge
-    new MeshStandardMaterial({ color: '#111' }),       // 1: left edge (spine)
-    new MeshStandardMaterial({ color: whiteColor }),  // 2: top edge
-    new MeshStandardMaterial({ color: whiteColor }),  // 3: bottom edge
-    // index 4 (front face) and index 5 (back face) are added dynamically per-page below
+    new MeshStandardMaterial({ color: whiteColor }),
+    new MeshStandardMaterial({ color: '#111' }),
+    new MeshStandardMaterial({ color: whiteColor }),
+    new MeshStandardMaterial({ color: whiteColor }),
 ];
 
 pages.forEach((page) => {
@@ -88,7 +86,7 @@ const Page = ({ number, front, back, ...props }) => {
     const SkinnedMeshMemo = useMemo(() => {
         const bones = [];
         for (let i = 0; i <= pageSegments; i++) {
-            let bone = new Bone(); // fixed: Bone was not imported
+            let bone = new Bone();
             bone.position.x = 0;
             if (i === 0) {
                 bone.position.x = 0;
@@ -98,7 +96,7 @@ const Page = ({ number, front, back, ...props }) => {
             if (i > 0) {
                 bones[i - 1].add(bone);
             }
-            bones.push(bone); // fixed: bones were created but never added to the array
+            bones.push(bone);
         }
         const skeleton = new Skeleton(bones);
 
@@ -130,16 +128,16 @@ const Page = ({ number, front, back, ...props }) => {
         ];
         const mesh = new SkinnedMesh(pageGeometry, mats);
         mesh.castShadow = true;
-        mesh.receiveShadow = true; // fixed: typo was 'recieveShadow'
+        mesh.receiveShadow = true;
         mesh.frustumCulled = false;
         mesh.add(skeleton.bones[0]);
         mesh.bind(skeleton);
         return mesh;
-    }, [picture, picture2, pictureRoughness]); // textures are async — memo must re-run once they load
+    }, [picture, picture2, pictureRoughness]);
 
     return (
         <group {...props} ref={group}>
-            <primitive object={SkinnedMeshMemo} ref={skinnedMeshRef} /> {/* fixed: typo was 'primative' */}
+            <primitive object={SkinnedMeshMemo} ref={skinnedMeshRef} />
         </group>
     );
 };
