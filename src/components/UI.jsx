@@ -12,7 +12,7 @@ export const pages = [
         front: "LinkedIN",
         back: "Projects",
         link: "https://www.linkedin.com/in/andre-maciels/",
-        label: "LinkedIN"
+        label: "LinkedIn"
     },
     {
         front: "GitHub",
@@ -22,9 +22,15 @@ export const pages = [
     },
     {
         front: "ResumeImage",
-        back: "book-back",
-        link: "google.com",
+        back: "Arrow",
+        link: "/textures/Andre_Maciel_Resume2026.pdf",
         label: "Resume"
+    },
+    {
+        front: "Music",
+        back: "book-back",
+        link: "https://google.com",
+        label: "Musician Feature"
     }
 ];
 
@@ -44,7 +50,7 @@ export const UI = () => {
     }, [handleMouseMove]);
 
     useEffect(() => {
-        const audio = new Audio("/audios/page-flip-01a.mp3");
+        const audio = new Audio("/audio/page-flip.mp3");
         audio.play();
     }, [page]);
 
@@ -57,11 +63,8 @@ export const UI = () => {
 
     return (
         <>
-            <main className=" pointer-events-none select-none z-10 fixed  inset-0  flex justify-between flex-col">
-                <a
-                    className="pointer-events-auto mt-10 ml-10"
-                >
-                </a>
+            <main className="pointer-events-none select-none z-10 fixed inset-0 flex justify-between flex-col">
+                <a className="pointer-events-auto mt-10 ml-10"></a>
                 <div className="w-full overflow-auto pointer-events-auto flex justify-center">
                     <div className="overflow-auto flex items-center gap-4 max-w-full p-10">
                         {[...pages].map((_, index) => (
@@ -91,8 +94,8 @@ export const UI = () => {
 
             <div className="fixed inset-0 flex items-center -rotate-2 select-none z-0 pointer-events-none overflow-hidden">
                 <div className="relative">
-                    <div className="bg-white/0  animate-horizontal-scroll flex items-center gap-8 w-max px-8">
-                        <h1 className="shrink-0 text-white text-10xl font-black ">
+                    <div className="bg-white/0 animate-horizontal-scroll flex items-center gap-8 w-max px-8">
+                        <h1 className="shrink-0 text-white text-10xl font-black">
                             Andre Maciel
                         </h1>
                         <h2 className="shrink-0 text-white text-8xl italic font-light">
@@ -103,7 +106,7 @@ export const UI = () => {
                         </h2>
                     </div>
                     <div className="absolute top-0 left-0 bg-white/0 animate-horizontal-scroll-2 flex items-center gap-8 px-8 w-max">
-                        <h1 className="shrink-0 text-white text-10xl font-black ">
+                        <h1 className="shrink-0 text-white text-10xl font-black">
                             Andre Maciel
                         </h1>
                         <h2 className="shrink-0 text-white text-8xl italic font-light">

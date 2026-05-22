@@ -11,6 +11,7 @@ function App() {
             <Canvas
                 shadows
                 camera={{ position: [-0.5, 1, 4], fov: 45 }}
+                gl={{ outputColorSpace: "srgb" }}
             >
                 <Suspense fallback={null}>
                     <Experience />
