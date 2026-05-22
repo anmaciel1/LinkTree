@@ -1,8 +1,10 @@
 import { useMemo, useRef } from "react";
-import { pages } from "./UI";
+import { useAtom } from "jotai";
+import { pageAtom, pages } from "./UI";
 import {
     BoxGeometry,
     Float32BufferAttribute,
+    MathUtils,
     Skeleton,
     SkinnedMesh,
     Uint16BufferAttribute,
@@ -12,8 +14,13 @@ import {
     SRGBColorSpace,
 } from "three";
 import { useTexture } from "@react-three/drei";
-
+import { useFrame } from "@react-three/fiber";
+import { degToRad } from "three/src/math/MathUtils.js";
+import { easing } from "maath";
 // https://threejs.org/docs/#BoxGeometry
+const lerpNum = 0.08 // For controlling speed of transition
+
+const smoothTurn = 0.5 // Using Maath for smoother transitions.
 const pageWidth = 1.28;
 const pageHeight = 1.78;
 const pageDepth = 0.005;
@@ -71,7 +78,7 @@ pages.forEach((page) => {
 
 // https://threejs.org/docs/#SkinnedMesh
 // Using skinned mesh because it acts as a skeleton, allowing natural animation looking bends in the book.
-const Page = ({ number, front, back, ...props }) => {
+const Page = ({ number, front, back, page, opened, ...props }) => {
     const [picture, picture2, pictureRoughness] = useTexture([
         `/textures/${front}.jpg`,
         `/textures/${back}.jpg`,
@@ -109,7 +116,7 @@ const Page = ({ number, front, back, ...props }) => {
                     roughnessMap: pictureRoughness,
                 }
                 : {
-                    roughness: 0.1,
+                    roughness: 1,
                 }
             )
         }),
@@ -121,7 +128,7 @@ const Page = ({ number, front, back, ...props }) => {
                     roughnessMap: pictureRoughness,
                 }
                 : {
-                    roughness: 0.1,
+                    roughness: 1,
                 }
             )
         })
@@ -135,20 +142,44 @@ const Page = ({ number, front, back, ...props }) => {
         return mesh;
     }, [picture, picture2, pictureRoughness]);
 
+    useFrame((_, delta) => {
+        if (!skinnedMeshRef.current) {
+            return;
+        }
+        let targetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
+        targetRotation += degToRad(number * 0.8);
+        const bones = skinnedMeshRef.current.skeleton.bones;
+        easing.dampAngle(
+            bones[0].rotation,
+            "y",
+            targetRotation,
+            smoothTurn,
+            delta
+        );
+    });
+
     return (
         <group {...props} ref={group}>
-            <primitive object={SkinnedMeshMemo} ref={skinnedMeshRef} />
+            <primitive
+                object={SkinnedMeshMemo}
+                ref={skinnedMeshRef}
+                position-z={-number * pageDepth + page * pageDepth}
+            />
         </group>
     );
 };
 
 export const Book = ({ ...props }) => {
+    const [page] = useAtom(pageAtom);
     return (
-        <group {...props}>
+        <group {...props} rotation-y={-Math.PI / 2}>
             {[...pages].map((pageData, index) => (
-                index === 0 ?
-                    <Page key={index} number={index} {...pageData}
-                    /> : null
+                <Page key={index}
+                    number={index}
+                    page={page}
+                    opened={page > index}
+                    {...pageData}
+                />
             ))}
         </group>
     );
