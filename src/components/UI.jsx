@@ -115,7 +115,7 @@ export const UI = () => {
                     </div>
                 </div>
             </div>
-            {/* 
+
             {hoveredLink && (
                 <a
                     ref={tooltipRef}
@@ -128,7 +128,7 @@ export const UI = () => {
                         left: mousePos.x + 16,
                         top: mousePos.y - 20,
                         zIndex: 9999,
-                        background: "rgba(0,0,0,0.75)",
+                        background: "#C96442",
                         backdropFilter: "blur(12px)",
                         color: "#fff",
                         padding: "8px 18px",
@@ -148,7 +148,7 @@ export const UI = () => {
                 >
                     <span style={{ fontSize: "16px" }}>↗</span> {hoveredLabel}
                 </a>
-            )} */}
+            )}
         </>
     );
 };

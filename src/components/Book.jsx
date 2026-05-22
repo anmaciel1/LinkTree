@@ -1,10 +1,9 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { pageAtom, pages } from "./UI";
+import { pageAtom, hoveredPageAtom, pages } from "./UI";
 import {
     BoxGeometry,
     Float32BufferAttribute,
-    MathUtils,
     Skeleton,
     SkinnedMesh,
     Uint16BufferAttribute,
@@ -13,13 +12,14 @@ import {
     MeshStandardMaterial,
     SRGBColorSpace,
 } from "three";
-import { useTexture } from "@react-three/drei";
+import { useTexture, useCursor } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { easing } from "maath";
 // https://threejs.org/docs/#BoxGeometry
-const lerpNum = 0.08 // For controlling speed of transition
-
+const lerpNum = 0.08; // For controlling speed of transition
+const CurveStrenght = 0.15;         // inside curve strength
+const outsideCurveStrength = 0.05;  // outside curve strength — renamed: was 'outsideCurve', shadowed the loop variable
 const smoothTurn = 0.5 // Using Maath for smoother transitions.
 const pageWidth = 1.28;
 const pageHeight = 1.78;
@@ -78,7 +78,7 @@ pages.forEach((page) => {
 
 // https://threejs.org/docs/#SkinnedMesh
 // Using skinned mesh because it acts as a skeleton, allowing natural animation looking bends in the book.
-const Page = ({ number, front, back, page, opened, ...props }) => {
+const Page = ({ number, front, back, page, opened, bookClosed, link, ...props }) => {
     const [picture, picture2, pictureRoughness] = useTexture([
         `/textures/${front}.jpg`,
         `/textures/${back}.jpg`,
@@ -87,6 +87,10 @@ const Page = ({ number, front, back, page, opened, ...props }) => {
             : [])
     ]);
     picture.colorSpace = picture2.colorSpace = SRGBColorSpace;
+    const [highlighted, setHighlighted] = useState(false);
+    const [, setPage] = useAtom(pageAtom);
+    const [, setHoveredPage] = useAtom(hoveredPageAtom);
+    useCursor(highlighted);
     const group = useRef();
     const skinnedMeshRef = useRef();
 
@@ -149,18 +153,56 @@ const Page = ({ number, front, back, page, opened, ...props }) => {
         let targetRotation = opened ? -Math.PI / 2 : Math.PI / 2;
         targetRotation += degToRad(number * 0.8);
         const bones = skinnedMeshRef.current.skeleton.bones;
-        easing.dampAngle(
-            bones[0].rotation,
-            "y",
-            targetRotation,
-            smoothTurn,
-            delta
-        );
+        for (let i = 0; i < bones.length; i++) {
+            const target = i === 0 ? group.current : bones[i];
+
+            const insideCurveIntensity = i < 8 ? Math.sin(i * 0.2 + 0.15) : 0;
+            const outsideCurveIntensity = i >= 8 ? Math.cos(i * 0.3 + 0.09) : 0;
+            let angle = CurveStrenght * insideCurveIntensity * targetRotation -
+                outsideCurveStrength * outsideCurveIntensity * targetRotation;
+            if (bookClosed) {
+                if (i === 0) {
+                    angle = targetRotation;
+                } else {
+                    angle = 0;
+                }
+            }
+
+            easing.dampAngle(
+                target.rotation,
+                "y",
+                angle,
+                smoothTurn,
+                delta
+            );
+        }
     });
 
     return (
         <group {...props} ref={group}>
             <primitive
+                onPointerEnter={(e) => {
+                    e.stopPropagation();
+                    setHighlighted(true);
+                    if (link && !opened) {
+                        setHoveredPage(number);
+                    }
+                }}
+                onPointerLeave={(e) => {
+                    e.stopPropagation();
+                    setHighlighted(false);
+                    setHoveredPage(-1);
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (link && !opened) {
+                        window.open(link, "_blank", "noopener,noreferrer");
+                    } else {
+                        setPage(opened ? number : number + 1);
+                    }
+                    setHighlighted(false);
+                    setHoveredPage(-1);
+                }}
                 object={SkinnedMeshMemo}
                 ref={skinnedMeshRef}
                 position-z={-number * pageDepth + page * pageDepth}
@@ -171,6 +213,7 @@ const Page = ({ number, front, back, page, opened, ...props }) => {
 
 export const Book = ({ ...props }) => {
     const [page] = useAtom(pageAtom);
+
     return (
         <group {...props} rotation-y={-Math.PI / 2}>
             {[...pages].map((pageData, index) => (
@@ -178,6 +221,7 @@ export const Book = ({ ...props }) => {
                     number={index}
                     page={page}
                     opened={page > index}
+                    bookClosed={page === 0 || page === pages.length}
                     {...pageData}
                 />
             ))}
