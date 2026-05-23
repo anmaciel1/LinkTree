@@ -1,7 +1,12 @@
 import { atom, useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MusicFeature } from "./MusicFeature";
 export const pageAtom = atom(0);
 export const hoveredPageAtom = atom(-1);
+export const musicFeatureOpenAtom = atom(false);
+export const savedSongAtom = atomWithStorage("andre-linktree-song-v1", null);
+export const storyAtom = atomWithStorage("andre-linktree-story-v1", null);
 
 export const pages = [
     {
@@ -29,7 +34,7 @@ export const pages = [
     {
         front: "Music",
         back: "book-back",
-        link: "https://google.com",
+        musicFeature: true,
         label: "Musician Feature"
     }
 ];
@@ -60,6 +65,7 @@ export const UI = () => {
             : null;
     const hoveredLink = hoveredData?.link || "";
     const hoveredLabel = hoveredData?.label || "";
+    const hoveredIsMusic = !!hoveredData?.musicFeature;
 
     return (
         <>
@@ -119,13 +125,9 @@ export const UI = () => {
                 </div>
             </div>
 
-            {hoveredLink && (
-                <a
+            {(hoveredLink || hoveredIsMusic) && (
+                <div
                     ref={tooltipRef}
-                    href={hoveredLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pointer-events-auto"
                     style={{
                         position: "fixed",
                         left: mousePos.x + 16,
@@ -149,9 +151,14 @@ export const UI = () => {
                         gap: "6px",
                     }}
                 >
-                    <span style={{ fontSize: "16px" }}>↗</span> {hoveredLabel}
-                </a>
+                    <span style={{ fontSize: "16px" }}>
+                        {hoveredIsMusic ? "♪" : "↗"}
+                    </span>{" "}
+                    {hoveredLabel}
+                </div>
             )}
+
+            <MusicFeature />
         </>
     );
 };

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { pageAtom, hoveredPageAtom, pages } from "./UI";
+import { pageAtom, hoveredPageAtom, musicFeatureOpenAtom, pages } from "./UI";
 import {
     BoxGeometry,
     Float32BufferAttribute,
@@ -78,7 +78,7 @@ pages.forEach((page) => {
 
 // https://threejs.org/docs/#SkinnedMesh
 // Using skinned mesh because it acts as a skeleton, allowing natural animation looking bends in the book.
-const Page = ({ number, front, back, page, opened, bookClosed, link, ...props }) => {
+const Page = ({ number, front, back, page, opened, bookClosed, link, musicFeature, ...props }) => {
     const [picture, picture2, pictureRoughness] = useTexture([
         `/textures/${front}.jpg`,
         `/textures/${back}.jpg`,
@@ -90,6 +90,7 @@ const Page = ({ number, front, back, page, opened, bookClosed, link, ...props })
     const [highlighted, setHighlighted] = useState(false);
     const [, setPage] = useAtom(pageAtom);
     const [, setHoveredPage] = useAtom(hoveredPageAtom);
+    const [, setMusicFeatureOpen] = useAtom(musicFeatureOpenAtom);
     useCursor(highlighted);
     const group = useRef();
     const skinnedMeshRef = useRef();
@@ -184,7 +185,7 @@ const Page = ({ number, front, back, page, opened, bookClosed, link, ...props })
                 onPointerEnter={(e) => {
                     e.stopPropagation();
                     setHighlighted(true);
-                    if (link && !opened) {
+                    if ((link || musicFeature) && !opened) {
                         setHoveredPage(number);
                     }
                 }}
@@ -195,7 +196,9 @@ const Page = ({ number, front, back, page, opened, bookClosed, link, ...props })
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
-                    if (link && !opened) {
+                    if (musicFeature && !opened) {
+                        setMusicFeatureOpen(true);
+                    } else if (link && !opened) {
                         window.open(link, "_blank", "noopener,noreferrer");
                     } else {
                         setPage(opened ? number : number + 1);
