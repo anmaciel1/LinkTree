@@ -1,7 +1,12 @@
 import { atom, useAtom } from "jotai";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { atomWithStorage } from "jotai/utils";
+import { useCallback, useEffect, useState } from "react";
+import { MusicFeature } from "./MusicFeature";
 export const pageAtom = atom(0);
 export const hoveredPageAtom = atom(-1);
+export const musicFeatureOpenAtom = atom(false);
+export const savedSongAtom = atomWithStorage("andre-linktree-song-v1", null);
+export const storyAtom = atomWithStorage("andre-linktree-story-v1", null);
 
 export const pages = [
     {
@@ -29,7 +34,7 @@ export const pages = [
     {
         front: "Music",
         back: "book-back",
-        link: "https://google.com",
+        musicFeature: true,
         label: "Musician Feature"
     }
 ];
@@ -38,7 +43,6 @@ export const UI = () => {
     const [page, setPage] = useAtom(pageAtom);
     const [hoveredPage] = useAtom(hoveredPageAtom);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const tooltipRef = useRef(null);
 
     const handleMouseMove = useCallback((element) => {
         setMousePos({ x: element.clientX, y: element.clientY });
@@ -60,17 +64,17 @@ export const UI = () => {
             : null;
     const hoveredLink = hoveredData?.link || "";
     const hoveredLabel = hoveredData?.label || "";
+    const hoveredIsMusic = !!hoveredData?.musicFeature;
 
     return (
         <>
-            <main className="pointer-events-none select-none z-10 fixed inset-0 flex justify-between flex-col">
-                <a className="pointer-events-auto mt-10 ml-10"></a>
-                <div className="w-full overflow-auto pointer-events-auto flex justify-center">
-                    <div className="overflow-auto flex items-center gap-4 max-w-full p-10">
+            <main className="pointer-events-none select-none z-10 fixed inset-0 flex justify-end flex-col">
+                <div className="w-full overflow-x-auto pointer-events-auto flex justify-center">
+                    <div className="flex items-center gap-2 sm:gap-4 max-w-full px-3 py-4 sm:p-10">
                         {[...pages].map((_, index) => (
                             <button
                                 key={index}
-                                className={`border-transparent hover:border-white transition-all duration-300  px-4 py-3 rounded-full  text-lg uppercase shrink-0 border ${index === page
+                                className={`border-transparent hover:border-white transition-all duration-300 px-3 sm:px-4 py-2 sm:py-3 rounded-full text-xs sm:text-lg uppercase shrink-0 border ${index === page
                                     ? "bg-white/90 text-black"
                                     : "bg-black/30 text-white"
                                     }`}
@@ -80,7 +84,7 @@ export const UI = () => {
                             </button>
                         ))}
                         <button
-                            className={`border-transparent hover:border-white transition-all duration-300  px-4 py-3 rounded-full  text-lg uppercase shrink-0 border ${page === pages.length
+                            className={`border-transparent hover:border-white transition-all duration-300 px-3 sm:px-4 py-2 sm:py-3 rounded-full text-xs sm:text-lg uppercase shrink-0 border ${page === pages.length
                                 ? "bg-white/90 text-black"
                                 : "bg-black/30 text-white"
                                 }`}
@@ -93,39 +97,34 @@ export const UI = () => {
             </main>
 
             <div className="fixed inset-0 flex items-center -rotate-2 select-none z-0 pointer-events-none overflow-hidden">
-                <div className="relative">
-                    <div className="bg-white/0 animate-horizontal-scroll flex items-center gap-8 w-max px-8">
-                        <h1 className="shrink-0 text-white text-10xl font-black">
+                <div className="relative w-full">
+                    <div className="bg-white/0 animate-horizontal-scroll flex items-center gap-4 sm:gap-8 w-max px-4 sm:px-8">
+                        <h1 className="shrink-0 whitespace-nowrap text-white font-black text-[clamp(2.5rem,9vw,9rem)]">
                             Andre Maciel
                         </h1>
-                        <h2 className="shrink-0 text-white text-8xl italic font-light">
+                        <h2 className="shrink-0 whitespace-nowrap text-white italic font-light text-[clamp(1.75rem,6vw,6rem)]">
                             Digital Nest
                         </h2>
-                        <h2 className="shrink-0 text-white text-12xl font-bold">
+                        <h2 className="shrink-0 whitespace-nowrap text-white font-bold text-[clamp(2.5rem,10vw,10rem)]">
                             Software Developer
                         </h2>
                     </div>
-                    <div className="absolute top-0 left-0 bg-white/0 animate-horizontal-scroll-2 flex items-center gap-8 px-8 w-max">
-                        <h1 className="shrink-0 text-white text-10xl font-black">
+                    <div className="absolute top-0 left-0 bg-white/0 animate-horizontal-scroll-2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 w-max">
+                        <h1 className="shrink-0 whitespace-nowrap text-white font-black text-[clamp(2.5rem,9vw,9rem)]">
                             Andre Maciel
                         </h1>
-                        <h2 className="shrink-0 text-white text-8xl italic font-light">
+                        <h2 className="shrink-0 whitespace-nowrap text-white italic font-light text-[clamp(1.75rem,6vw,6rem)]">
                             Digital Nest
                         </h2>
-                        <h2 className="shrink-0 text-white text-12xl font-bold">
+                        <h2 className="shrink-0 whitespace-nowrap text-white font-bold text-[clamp(2.5rem,10vw,10rem)]">
                             Software Developer
                         </h2>
                     </div>
                 </div>
             </div>
 
-            {hoveredLink && (
-                <a
-                    ref={tooltipRef}
-                    href={hoveredLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pointer-events-auto"
+            {(hoveredLink || hoveredIsMusic) && (
+                <div
                     style={{
                         position: "fixed",
                         left: mousePos.x + 16,
@@ -149,9 +148,14 @@ export const UI = () => {
                         gap: "6px",
                     }}
                 >
-                    <span style={{ fontSize: "16px" }}>↗</span> {hoveredLabel}
-                </a>
+                    <span style={{ fontSize: "16px" }}>
+                        {hoveredIsMusic ? "♪" : "↗"}
+                    </span>{" "}
+                    {hoveredLabel}
+                </div>
             )}
+
+            <MusicFeature />
         </>
     );
 };
