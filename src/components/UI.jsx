@@ -28,7 +28,7 @@ export const pages = [
     {
         front: "ResumeImage",
         back: "Arrow",
-        link: "/textures/Andre_Maciel_Resume2026.pdf",
+        link: "textures/Andre_Maciel_Resume2026.pdf",
         label: "Resume"
     },
     {
@@ -54,7 +54,7 @@ export const UI = () => {
     }, [handleMouseMove]);
 
     useEffect(() => {
-        const audio = new Audio("/audio/page-flip.mp3");
+        const audio = new Audio("audio/page-flip.mp3");
         audio.play();
     }, [page]);
 
