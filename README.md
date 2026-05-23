@@ -2,6 +2,10 @@
 
 A 3D, animated LinkTree. Each page of the book is one of my links — LinkedIn, GitHub, Resume, and a music feature for musicians. Built with React, React Three Fiber, Drei, and Tailwind v4.
 
+```
+https://link-tree-three-ruby.vercel.app/
+```
+
 ## Running the application
 
 ```bash
@@ -24,7 +28,7 @@ Each page is configured in `src/components/UI.jsx` under the `pages` array. Addi
 
 ## The Feature I believe LinkTree should add
 
-The musician page opens a modal that lets you paste a Spotify track URL and turn the song into a 15-second snippet you can post — either as a permanent player on the profile or as a tap-to-play story on the avatar. Visitors can listen to that exact 15 seconds without leaving the site.
+The musician page opens a modal that lets you paste a Spotify track URL and turn the song into a 15-second snippet you can post, either as a permanent player on the profile or as a tap-to-play story on the avatar. Visitors can listen to that exact 15 seconds without leaving the site.
 
 ## Why this feature?
 
@@ -46,11 +50,11 @@ Both surfaces persist across page reloads via `localStorage` — the prototype h
 
 This is a mockup of the feature. The feature itself has some intricacies that need fixing, or slight refactoring as a whole, but I believe it gives a good insight into what the feature is. If this was a real feature, multiple things would be needed:
 
-OAuth - Not allowing users to paste in whatever song they want, only ones they produced.
-Database - Handling the metadata of the music. (Who's song, timestamp, length, etc.)
-Caching - Not having to call Spotify Web API every render.
+1. OAuth - Not allowing users to paste in whatever song they want, only ones they produced.
+2. Database - Handling the metadata of the music. (Who's song, timestamp, length, etc.)
+3. Caching - Not having to call Spotify Web API every render.
 
-Also, I the slider does not necessairly work. This is another feature that would significantly improve v2 of this.
+Also, the slider does not work. This is another feature that would significantly add to v2.
 
 ### How playback actually works
 
