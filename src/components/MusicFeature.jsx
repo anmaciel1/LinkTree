@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { musicFeatureOpenAtom, pages, savedSongAtom, storyAtom } from "./UI";
 
-const TRACK_DURATION_SEC = 30;
+const TRACK_DURATION_SEC = 30; // adding for push
 const CLIP_LENGTH_SEC = 15;
 const SAMPLE_URL = "https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b";
 
