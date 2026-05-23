@@ -16,11 +16,9 @@ import { useTexture, useCursor } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { easing } from "maath";
-// https://threejs.org/docs/#BoxGeometry
-const lerpNum = 0.08; // For controlling speed of transition
-const CurveStrenght = 0.15;         // inside curve strength
-const outsideCurveStrength = 0.05;  // outside curve strength — renamed: was 'outsideCurve', shadowed the loop variable
-const smoothTurn = 0.5 // Using Maath for smoother transitions.
+const CurveStrenght = 0.15;
+const outsideCurveStrength = 0.05;
+const smoothTurn = 0.5;
 const pageWidth = 1.28;
 const pageHeight = 1.78;
 const pageDepth = 0.005;

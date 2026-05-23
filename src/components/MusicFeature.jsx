@@ -251,7 +251,7 @@ export const MusicFeature = () => {
 
     return createPortal(
         <div
-            className="fixed inset-0 flex items-center justify-center p-4"
+            className="fixed inset-0 overflow-y-auto"
             style={{
                 zIndex: 10000,
                 background: "rgba(10,5,4,0.85)",
@@ -261,69 +261,77 @@ export const MusicFeature = () => {
                 if (e.target === e.currentTarget) setOpen(false);
             }}
         >
-            <button
-                onClick={() => setOpen(false)}
-                className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl flex items-center justify-center transition"
-                aria-label="Close"
+            <div
+                className="min-h-full flex items-center justify-center p-4"
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) setOpen(false);
+                }}
             >
-                ×
-            </button>
+                <button
+                    onClick={() => setOpen(false)}
+                    className="fixed top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl flex items-center justify-center transition"
+                    style={{ zIndex: 10001 }}
+                    aria-label="Close"
+                >
+                    ×
+                </button>
 
-            {step === "linktree" && (
-                <LinkTreeStep
-                    onSpotify={() => setStep("input")}
-                    onChangeSong={handleChangeSong}
-                    onRemoveSong={handleRemoveSong}
-                    onViewStory={() => setStep("story-viewer")}
-                />
-            )}
+                {step === "linktree" && (
+                    <LinkTreeStep
+                        onSpotify={() => setStep("input")}
+                        onChangeSong={handleChangeSong}
+                        onRemoveSong={handleRemoveSong}
+                        onViewStory={() => setStep("story-viewer")}
+                    />
+                )}
 
-            {step === "input" && (
-                <InputStep
-                    urlInput={urlInput}
-                    setUrlInput={setUrlInput}
-                    onContinue={() => handleContinue()}
-                    onSample={() => handleContinue(SAMPLE_URL)}
-                    onBack={() => setStep("linktree")}
-                    loading={loading}
-                    error={error}
-                />
-            )}
+                {step === "input" && (
+                    <InputStep
+                        urlInput={urlInput}
+                        setUrlInput={setUrlInput}
+                        onContinue={() => handleContinue()}
+                        onSample={() => handleContinue(SAMPLE_URL)}
+                        onBack={() => setStep("linktree")}
+                        loading={loading}
+                        error={error}
+                    />
+                )}
 
-            {step === "edit" && (
-                <EditStep
-                    trackId={trackId}
-                    trackTitle={trackTitle}
-                    artist={artist}
-                    setArtist={setArtist}
-                    clipStart={clipStart}
-                    setClipStart={setClipStart}
-                    onAutoPick={handleAutoPick}
-                    onBack={() => setStep("input")}
-                    onShare={() => setStep("preview")}
-                />
-            )}
+                {step === "edit" && (
+                    <EditStep
+                        trackId={trackId}
+                        trackTitle={trackTitle}
+                        artist={artist}
+                        setArtist={setArtist}
+                        clipStart={clipStart}
+                        setClipStart={setClipStart}
+                        onAutoPick={handleAutoPick}
+                        onBack={() => setStep("input")}
+                        onShare={() => setStep("preview")}
+                    />
+                )}
 
-            {step === "preview" && (
-                <PreviewStep
-                    trackId={trackId}
-                    trackTitle={trackTitle}
-                    thumbnailUrl={thumbnailUrl}
-                    artist={artist}
-                    clipStart={clipStart}
-                    onBack={() => setStep("edit")}
-                    onShareStory={handleShareToStory}
-                    onShareProfile={handleShareToProfile}
-                />
-            )}
+                {step === "preview" && (
+                    <PreviewStep
+                        trackId={trackId}
+                        trackTitle={trackTitle}
+                        thumbnailUrl={thumbnailUrl}
+                        artist={artist}
+                        clipStart={clipStart}
+                        onBack={() => setStep("edit")}
+                        onShareStory={handleShareToStory}
+                        onShareProfile={handleShareToProfile}
+                    />
+                )}
 
-            {step === "story-viewer" && savedStory && (
-                <StoryViewerStep
-                    story={savedStory}
-                    onClose={() => setStep("linktree")}
-                    onRemove={handleRemoveStory}
-                />
-            )}
+                {step === "story-viewer" && savedStory && (
+                    <StoryViewerStep
+                        story={savedStory}
+                        onClose={() => setStep("linktree")}
+                        onRemove={handleRemoveStory}
+                    />
+                )}
+            </div>
         </div>,
         document.body
     );
@@ -618,9 +626,9 @@ const EditStep = ({
 
             <button
                 onClick={onAutoPick}
-                className="w-full mt-5 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 text-sm transition flex items-center justify-center gap-2"
+                className="w-full mt-5 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 text-sm transition"
             >
-                <span></span> Pick for me
+                Pick for me
             </button>
 
             <div className="flex gap-3 mt-5">
@@ -715,7 +723,10 @@ const PreviewStep = ({ trackId, trackTitle, thumbnailUrl, artist, clipStart, onB
     }, [ready, play]);
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div
+            className="flex flex-col items-center gap-3"
+            style={{ width: "min(320px, 92vw, calc(65vh * 9 / 16))" }}
+        >
             <button
                 onClick={onBack}
                 className="self-start text-white/70 hover:text-white text-sm flex items-center gap-1 transition"
@@ -726,8 +737,8 @@ const PreviewStep = ({ trackId, trackTitle, thumbnailUrl, artist, clipStart, onB
             <button
                 onClick={toggle}
                 disabled={!ready}
-                className="relative rounded-2xl overflow-hidden shadow-2xl disabled:opacity-90"
-                style={{ width: 320, height: 568 }}
+                className="relative w-full rounded-2xl overflow-hidden shadow-2xl disabled:opacity-90"
+                style={{ aspectRatio: "9 / 16" }}
                 aria-label={playing ? "Pause" : "Play"}
             >
                 {thumbnailUrl ? (
@@ -754,49 +765,51 @@ const PreviewStep = ({ trackId, trackTitle, thumbnailUrl, artist, clipStart, onB
                     />
                 </div>
 
-                <div className="absolute top-7 left-4 right-4 flex items-center gap-2 text-white/85 text-xs">
-                    <div className="w-6 h-6 rounded-full bg-[#1DB954] flex items-center justify-center text-[10px] font-bold text-black">
+                <div className="absolute top-6 left-3 right-3 flex items-center gap-2 text-white/85 text-[11px]">
+                    <div className="w-5 h-5 rounded-full bg-[#1DB954] flex items-center justify-center text-[9px] font-bold text-black shrink-0">
                         S
                     </div>
-                    <span>Spotify · {playing ? "Now playing" : ready ? "Tap to play" : "Loading…"}</span>
+                    <span className="truncate">
+                        Spotify · {playing ? "Now playing" : ready ? "Tap to play" : "Loading…"}
+                    </span>
                 </div>
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
                     {thumbnailUrl ? (
                         <img
                             src={thumbnailUrl}
                             alt={trackTitle}
-                            className="w-44 h-44 rounded-xl shadow-2xl mb-6"
+                            className="w-[55%] aspect-square rounded-xl shadow-2xl mb-5"
                         />
                     ) : (
-                        <div className="w-44 h-44 rounded-xl bg-white/10 mb-6 flex items-center justify-center text-5xl text-white/40">
+                        <div className="w-[55%] aspect-square rounded-xl bg-white/10 mb-5 flex items-center justify-center text-5xl text-white/40">
                             ♪
                         </div>
                     )}
-                    <h3 className="text-white text-xl font-bold text-center px-4 leading-tight">
+                    <h3 className="text-white text-base sm:text-xl font-bold text-center px-2 leading-tight line-clamp-2">
                         {trackTitle}
                     </h3>
-                    <p className="text-white/80 text-sm mt-1">{artist}</p>
-                    <div className="mt-6 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur text-white/90 text-xs font-mono">
+                    <p className="text-white/80 text-xs sm:text-sm mt-1 truncate max-w-full px-2">{artist}</p>
+                    <div className="mt-4 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-white/90 text-[11px] font-mono">
                         {formatTime(clipStart)} – {formatTime(clipStart + CLIP_LENGTH_SEC)}
                     </div>
                 </div>
 
-                <div className="absolute bottom-5 left-0 right-0 text-center text-white/70 text-xs">
+                <div className="absolute bottom-4 left-0 right-0 text-center text-white/70 text-[11px] px-2">
                     {playing ? "▶ Playing 15-second snippet" : "15-second snippet"}
                 </div>
             </button>
 
-            <div className="flex flex-col gap-2" style={{ width: 320 }}>
+            <div className="flex flex-col gap-2 w-full">
                 <button
                     onClick={onShareStory}
-                    className="w-full py-3 rounded-lg bg-gradient-to-r from-[#1DB954] to-[#1ed760] hover:brightness-110 text-white font-semibold transition shadow"
+                    className="w-full py-2.5 sm:py-3 rounded-lg bg-gradient-to-r from-[#1DB954] to-[#1ed760] hover:brightness-110 text-white font-semibold text-sm sm:text-base transition shadow"
                 >
                     Share to Story
                 </button>
                 <button
                     onClick={onShareProfile}
-                    className="w-full py-3 rounded-lg bg-[#C96442] hover:bg-[#d97352] text-white font-semibold transition"
+                    className="w-full py-2.5 sm:py-3 rounded-lg bg-[#C96442] hover:bg-[#d97352] text-white font-semibold text-sm sm:text-base transition"
                 >
                     Share to Profile
                 </button>
@@ -835,10 +848,13 @@ const StoryViewerStep = ({ story, onClose, onRemove }) => {
     }, [ready, play]);
 
     return (
-        <div className="flex flex-col items-center gap-3">
+        <div
+            className="flex flex-col items-center gap-3"
+            style={{ width: "min(320px, 92vw, calc(72vh * 9 / 16))" }}
+        >
             <div
-                className="relative rounded-2xl overflow-hidden shadow-2xl"
-                style={{ width: 320, height: 568 }}
+                className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
+                style={{ aspectRatio: "9 / 16" }}
             >
                 {story.thumbnailUrl ? (
                     <img
@@ -864,59 +880,59 @@ const StoryViewerStep = ({ story, onClose, onRemove }) => {
                     />
                 </div>
 
-                <div className="absolute top-7 left-4 right-4 flex items-center gap-2 text-white/90 text-xs">
+                <div className="absolute top-6 left-3 right-3 flex items-center gap-2 text-white/90 text-[11px]">
                     <div
-                        className="rounded-full"
+                        className="rounded-full shrink-0"
                         style={{
                             padding: 2,
                             background:
                                 "conic-gradient(from 0deg, #1DB954, #1ed760, #C96442, #1DB954)",
                         }}
                     >
-                        <div className="w-7 h-7 rounded-full bg-[#C96442] flex items-center justify-center text-white text-[11px] font-bold">
+                        <div className="w-6 h-6 rounded-full bg-[#C96442] flex items-center justify-center text-white text-[10px] font-bold">
                             AM
                         </div>
                     </div>
-                    <span className="font-semibold">@andremaciel</span>
-                    <span className="text-white/50">· story</span>
+                    <span className="font-semibold truncate">@andremaciel</span>
+                    <span className="text-white/50 shrink-0">· story</span>
                 </div>
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
                     {story.thumbnailUrl ? (
                         <img
                             src={story.thumbnailUrl}
                             alt={story.title}
-                            className="w-44 h-44 rounded-xl shadow-2xl mb-6"
+                            className="w-[55%] aspect-square rounded-xl shadow-2xl mb-5"
                         />
                     ) : (
-                        <div className="w-44 h-44 rounded-xl bg-white/10 mb-6 flex items-center justify-center text-5xl text-white/40">
+                        <div className="w-[55%] aspect-square rounded-xl bg-white/10 mb-5 flex items-center justify-center text-5xl text-white/40">
                             ♪
                         </div>
                     )}
-                    <h3 className="text-white text-xl font-bold text-center px-4 leading-tight">
+                    <h3 className="text-white text-base sm:text-xl font-bold text-center px-2 leading-tight line-clamp-2">
                         {story.title}
                     </h3>
-                    <p className="text-white/80 text-sm mt-1">{story.artist}</p>
-                    <div className="mt-6 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur text-white/90 text-xs font-mono">
+                    <p className="text-white/80 text-xs sm:text-sm mt-1 truncate max-w-full px-2">{story.artist}</p>
+                    <div className="mt-4 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-white/90 text-[11px] font-mono">
                         {formatTime(clipStart)} – {formatTime(clipStart + clipLen)}
                     </div>
                 </div>
 
-                <div className="absolute bottom-5 left-0 right-0 text-center text-white/70 text-xs">
+                <div className="absolute bottom-4 left-0 right-0 text-center text-white/70 text-[11px] px-2">
                     {playing ? "▶ Playing" : ready ? "Loading…" : "Tap below to play"}
                 </div>
             </div>
 
-            <div className="flex gap-3" style={{ width: 320 }}>
+            <div className="flex gap-2 w-full">
                 <button
                     onClick={onClose}
-                    className="flex-[2] py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition"
+                    className="flex-[2] py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-sm sm:text-base transition"
                 >
                     Close
                 </button>
                 <button
                     onClick={onRemove}
-                    className="flex-1 py-2.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-300 text-sm transition"
+                    className="flex-1 py-2.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-300 text-xs sm:text-sm transition"
                 >
                     Remove
                 </button>
