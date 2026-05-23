@@ -1,4 +1,4 @@
-# Andre Maciel — LinkTree
+# LinkTree
 
 A 3D, animated LinkTree. The cover sits on a desk; each page of the book is one of my links — LinkedIn, GitHub, Resume, and a music feature for musicians. Built with React, React Three Fiber, Drei, and Tailwind v4.
 
